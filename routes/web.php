@@ -17,12 +17,19 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::middleware([
-    'auth:sanctum',
-    config('jetstream.auth_session'),
-    'verified'
-])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+//auth route for both 
+Route::group(['middleware' => ['auth']], function() { 
+    Route::get('/dashboard', 'App\Http\Controllers\DashboardController@index')->name('dashboard');
 });
+
+// for admins
+Route::group(['middleware' => ['auth', 'role:admin']], function() { 
+    Route::get('/dashboard/adminprof', 'App\Http\Controllers\DashboardController@adminprof')->name('dashboard.adminprof');
+});
+
+// for employees
+Route::group(['middleware' => ['auth', 'role:employee']], function() { 
+    Route::get('/dashboard/employeeprof', 'App\Http\Controllers\DashboardController@employeeprof')->name('dashboard.employeeprof');
+});
+
+require __DIR__.'/auth.php';
